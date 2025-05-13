@@ -11,6 +11,12 @@ public class BanAnDTO {
         this.trangThai = trangThai;
     }
 
+    //Constructor de insert len database
+    public BanAnDTO(String ten, int trangThai) {
+        this.ten = ten;
+        this.trangThai = trangThai;
+    }
+    
     public int getId() {
         return id;
     }
@@ -34,7 +40,11 @@ public class BanAnDTO {
     public void setTrangThai(int trangThai) {
         this.trangThai = trangThai;
     }   
-    
+
+    @Override
+    public String toString() {
+        return "BanAnDTO{" + "id=" + id + ", ten=" + ten + ", trangThai=" + trangThai + '}';
+    }
     
 }
 
