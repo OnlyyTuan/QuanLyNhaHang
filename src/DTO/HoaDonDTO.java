@@ -82,4 +82,8 @@ public class HoaDonDTO {
     public String toString() {
         return "HoaDon{" + "id=" + id + ", idBanAn=" + idBanAn + ", idNhanVien=" + idNhanVien + ", tenKhach=" + tenKhach + ", tongTien=" + tongTien + ", thoiGian=" + thoiGian + ", ghiChu=" + ghiChu + '}';
     }
+
+    public Object getMaHoaDon() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
