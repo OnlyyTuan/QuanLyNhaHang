@@ -19,9 +19,9 @@ public class TaiKhoanDAO {
             ResultSet rs = (ResultSet) pst.executeQuery();
             while(rs.next()){
                 int id = rs.getInt("id");
-                int idNhanVien = rs.getInt("nhanvien_id");
-                int idQuyen = rs.getInt("quyen_id");
-                String tenTaiKhoan = rs.getString("tenTaiKhoan");
+                int idNhanVien = rs.getInt("id_nhanVien");
+                int idQuyen = rs.getInt("id_quyen");
+                String tenTaiKhoan = rs.getString("taiKhoan");
                 String matKhau = rs.getString("matKhau");
                 int trangThai = rs.getInt("trangThai");
                 TaiKhoanDTO tk = new TaiKhoanDTO(id,idNhanVien,idQuyen,tenTaiKhoan,matKhau,trangThai);
@@ -38,17 +38,23 @@ public class TaiKhoanDAO {
         int result = 0;
         try{
             Connection conn = (Connection) DBConnector.getConnection();
-            String query = "INSERT INTO taikhoan (id,nhanvien_id,quyen_id,tenTaiKhoan,matKhau,trangThai) VALUES (?,?,?,?,?,?)";
-            PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, tk.getId());
-            pst.setInt(2, tk.getIdNhanVien());
-            pst.setInt(3, tk.getIdQuyen());
-            pst.setString(4, tk.getTenTaiKhoan());
-            pst.setString(5, tk.getMatKhau());
-            pst.setInt(6, tk.getTrangThai());
+            String query = "INSERT INTO taikhoan (id_nhanVien,id_quyen,taiKhoan,matKhau,trangThai) VALUES (?,?,?,?,?)";
+            PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, tk.getIdNhanVien());
+            pst.setInt(2, tk.getIdQuyen());
+            pst.setString(3, tk.getTenTaiKhoan());
+            pst.setString(4, tk.getMatKhau());
+            pst.setInt(5, tk.getTrangThai());
             result = pst.executeUpdate();
-            DBConnector.closeConnection(conn);
             
+            if (result > 0) {
+                ResultSet rs = pst.getGeneratedKeys();
+                if (rs.next()) {
+                    result = rs.getInt(1);
+                }
+            }
+            
+            DBConnector.closeConnection(conn);
         } catch (Exception e) {
             System.out.println(e);
         }

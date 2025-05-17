@@ -9,13 +9,19 @@ package BUS;
  * @author MSI
  */
 public class Result {
-    
-    public boolean isSuccess;
-    public String message;
-    
-    public Result(boolean isSuccess, String message) {
-        this.isSuccess = isSuccess;
+    private boolean success;
+    private String message;
+
+    public Result(boolean success, String message) {
+        this.success = success;
         this.message = message;
     }
-    
-}
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+} 

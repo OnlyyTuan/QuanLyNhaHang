@@ -4,9 +4,12 @@ public class QuyenDTO {
     private int id;
     private String ten;
 
+    public QuyenDTO() {
+    }
     public QuyenDTO(int id, String ten) {
         this.id = id;
         this.ten = ten;
+        
     }
 
     public int getId() {
@@ -24,6 +27,7 @@ public class QuyenDTO {
     public void setTen(String ten) {
         this.ten = ten;
     }
+
 
     @Override
     public String toString() {

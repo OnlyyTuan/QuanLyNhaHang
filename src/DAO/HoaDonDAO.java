@@ -20,13 +20,13 @@ public class HoaDonDAO {
             ResultSet rs = (ResultSet) pst.executeQuery();
             while(rs.next()){
                 int id = rs.getInt("id");
-                int idBanAn = rs.getInt("banan_id");
-                int nhanVienId= rs.getInt("nhanvien_id");
+                int idBanAn = rs.getInt("id_banAn");
+                int nhanVienId = rs.getInt("id_nhanVien");
                 String tenKhach = rs.getString("tenKhach");
                 int tongTien = rs.getInt("tongTien");
-                Timestamp thoiGian = rs.getTimestamp("thoiGian");
-                String ghiChu =rs.getString("ghiChu");
-                HoaDonDTO hd = new HoaDonDTO(id,idBanAn,nhanVienId,tenKhach,tongTien,thoiGian,ghiChu);
+                Timestamp thoiGian = rs.getTimestamp("thoigian");
+                String ghiChu = rs.getString("ghiChu");
+                HoaDonDTO hd = new HoaDonDTO(id, idBanAn, nhanVienId, tenKhach, tongTien, thoiGian, ghiChu);
                 result.add(hd);
             }
             DBConnector.closeConnection(conn);
@@ -40,15 +40,14 @@ public class HoaDonDAO {
         int result=0;
         try{
             Connection conn = (Connection) DBConnector.getConnection();
-            String query = "INSERT INTO hoadon (id,banan_id,nhanvien_id,tenKhach,tongTien,thoiGian,ghiChu) VALUES (?,?,?,?,?,?,?)";
+            String query = "INSERT INTO hoadon (id_banAn, id_nhanVien, tenKhach, tongTien, thoigian, ghiChu) VALUES (?,?,?,?,?,?)";
             PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, hd.getId());
-            pst.setInt(2, hd.getIdBanAn());
-            pst.setInt(3, hd.getIdNhanVien());
-            pst.setString(4, hd.getTenKhach());
-            pst.setInt(5, hd.getTongTien());
-            pst.setTimestamp(6, hd.getThoiGian());
-            pst.setString(7, hd.getGhiChu());
+            pst.setInt(1, hd.getIdBanAn());
+            pst.setInt(2, hd.getIdNhanVien());
+            pst.setString(3, hd.getTenKhach());
+            pst.setInt(4, hd.getTongTien());
+            pst.setTimestamp(5, hd.getThoiGian());
+            pst.setString(6, hd.getGhiChu());
             result = pst.executeUpdate();
             DBConnector.closeConnection(conn);
             
@@ -68,13 +67,13 @@ public class HoaDonDAO {
             ResultSet rs = (ResultSet) pst.executeQuery();
             while(rs.next()){
                 int id = rs.getInt("id");
-                int idBanAn = rs.getInt("banan_id");
-                int nhanVienId = rs.getInt("nhanvien_id");
+                int idBanAn = rs.getInt("id_banAn");
+                int nhanVienId = rs.getInt("id_nhanVien");
                 String tenKhach = rs.getString("tenKhach");
                 int tongTien = rs.getInt("tongTien");
-                Timestamp thoiGian = rs.getTimestamp("thoiGian");
+                Timestamp thoiGian = rs.getTimestamp("thoigian");
                 String ghiChu = rs.getString("ghiChu");
-                hd = new HoaDonDTO(id,idBanAn,nhanVienId,tenKhach,tongTien,thoiGian,ghiChu);
+                hd = new HoaDonDTO(id, idBanAn, nhanVienId, tenKhach, tongTien, thoiGian, ghiChu);
             }
             DBConnector.closeConnection(conn);
         } catch (Exception e) {
@@ -124,15 +123,15 @@ public class HoaDonDAO {
         int result = 0;
         try{
             Connection conn = (Connection) DBConnector.getConnection();
-            String query = "UPDATE hoadon SET banan_id=?,nhanvien_id=?,tenKhach=?,tongTien=?,thoiGian=?,ghiChu=? WHERE id=?";
+            String query = "UPDATE hoadon SET id_banAn=?, id_nhanVien=?, tenKhach=?, tongTien=?, thoigian=?, ghiChu=? WHERE id=?";
             PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, hd.getId());
-            pst.setInt(2, hd.getIdBanAn());
-            pst.setInt(3, hd.getIdNhanVien());
-            pst.setString(4, hd.getTenKhach());
-            pst.setInt(5, hd.getTongTien());
-            pst.setTimestamp(6, hd.getThoiGian());
-            pst.setString(7, hd.getGhiChu());
+            pst.setInt(1, hd.getIdBanAn());
+            pst.setInt(2, hd.getIdNhanVien());
+            pst.setString(3, hd.getTenKhach());
+            pst.setInt(4, hd.getTongTien());
+            pst.setTimestamp(5, hd.getThoiGian());
+            pst.setString(6, hd.getGhiChu());
+            pst.setInt(7, hd.getId());
             result = pst.executeUpdate();
             DBConnector.closeConnection(conn);
         } catch (Exception e) {

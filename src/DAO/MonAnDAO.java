@@ -19,7 +19,7 @@ public ArrayList<MonAnDTO> selectAll(){
         ResultSet rs = (ResultSet) pst.executeQuery();
         while(rs.next()){
             int id = rs.getInt("id");
-            int danhMucId=rs.getInt("danhmuc_id");
+            int danhMucId=rs.getInt("id_danhMuc");
             String ten = rs.getString("ten");
             String hinhAnh = rs.getString("hinhAnh");
             int gia = rs.getInt("gia");
@@ -38,14 +38,13 @@ public int insert(MonAnDTO ma){
     int result = 0;
     try{
         Connection conn = (Connection) DBConnector.getConnection();
-        String query = "INSERT INTO monan (id,danhmuc_id,ten,hinhAnh,gia,trangThai) VALUES (?,?,?,?,?,?)";
+        String query = "INSERT INTO monan (id_danhMuc,ten,hinhAnh,gia,trangThai) VALUES (?,?,?,?,?)";
         PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-        pst.setInt(1, ma.getId());
-        pst.setInt(2, ma.getIdDanhMuc());
-        pst.setString(3, ma.getTen());
-        pst.setString(4, ma.getHinhAnh());
-        pst.setInt(5, ma.getGia());
-        pst.setInt(6, ma.getTrangThai());
+        pst.setInt(1, ma.getIdDanhMuc());
+        pst.setString(2, ma.getTen());
+        pst.setString(3, ma.getHinhAnh());
+        pst.setInt(4, ma.getGia());
+        pst.setInt(5, ma.getTrangThai());
         result = pst.executeUpdate();
         DBConnector.closeConnection(conn);
     } catch (Exception e) {
@@ -64,7 +63,7 @@ public MonAnDTO selectById(String t){
         ResultSet rs = (ResultSet) pst.executeQuery();
         while(rs.next()){
             int id = rs.getInt("id");
-            int danhMucId = rs.getInt("danhmuc_id");
+            int danhMucId = rs.getInt("id_danhMuc");
             String ten = rs.getString("ten");
             String hinhAnh = rs.getString("hinhAnh");
             int gia = rs.getInt("gia");
@@ -119,7 +118,7 @@ public int update(MonAnDTO ma){
     int result = 0;
     try{
         Connection conn = (Connection) DBConnector.getConnection();
-        String query = "UPDATE monan SET danhmuc_id=?,ten=?,hinhAnh=?,gia=?,trangThai=? WHERE id=?";
+        String query = "UPDATE monan SET id_danhMuc=?,ten=?,hinhAnh=?,gia=?,trangThai=? WHERE id=?";
         PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
         pst.setInt(6, ma.getId());
         pst.setString(2, ma.getTen());

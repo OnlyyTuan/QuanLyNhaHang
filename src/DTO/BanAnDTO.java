@@ -5,6 +5,8 @@ public class BanAnDTO {
     private String ten;
     private int trangThai;
 
+    public BanAnDTO() {}
+    
     public BanAnDTO(int id, String ten, int trangThai) {
         this.id = id;
         this.ten = ten;

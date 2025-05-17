@@ -1,12 +1,20 @@
+package GUI;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package GUI;
 
+
+import com.formdev.flatlaf.FlatLightLaf;
+import javax.swing.UIManager;
 import BUS.*;
 import DTO.*;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.Color;
 import javax.swing.JOptionPane;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 /**
  *
@@ -15,13 +23,41 @@ import javax.swing.JOptionPane;
 public class LoginFrame extends javax.swing.JFrame {
     
     AppData appData = new AppData();
+    BanAnBUS banAnBUS = appData.getBanAnBUS();
     
     /**
      * Creates new form LoginFrame
      */
     public LoginFrame() {
         initComponents();
+        setTitle("Đăng Nhập");
         setLocationRelativeTo(null);
+        appData = new AppData();
+        banAnBUS = appData.getBanAnBUS();
+        
+        // Tùy chỉnh nút đăng nhập
+        jToggleButtonLogin.setBorder(new LineBorder(new Color(24, 144, 255), 2, true));
+        jToggleButtonLogin.setBackground(new Color(24, 144, 255));
+        jToggleButtonLogin.setForeground(Color.WHITE);
+        jToggleButtonLogin.setFocusPainted(false);
+        jToggleButtonLogin.setBorderPainted(true);
+        jToggleButtonLogin.setContentAreaFilled(true);
+        jToggleButtonLogin.setOpaque(true);
+        
+        // Thêm sự kiện hover
+        jToggleButtonLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jToggleButtonLogin.setBackground(new Color(0, 122, 204));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jToggleButtonLogin.setBackground(new Color(24, 144, 255));
+            }
+        });
+        
+        for(BanAnDTO i : banAnBUS.getList_banAn()) {
+            System.out.println(i);
+        }
     }
 
     /**
@@ -33,21 +69,97 @@ public class LoginFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTextField_LoginTK = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jToggleButtonLogin = new javax.swing.JToggleButton();
+        jPasswordField_LoginPWD = new javax.swing.JPasswordField();
+        jLabel3 = new javax.swing.JLabel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel1.setText("Tài Khoản");
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setText("Mật Khẩu");
+
+        jToggleButtonLogin.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jToggleButtonLogin.setText("Đăng Nhập");
+        jToggleButtonLogin.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12))); // NOI18N
+        jToggleButtonLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonLoginActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 153, 255));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("QUẢN LÝ NHÀ HÀNG");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(63, 63, 63)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(104, 104, 104)
+                        .addComponent(jToggleButtonLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(60, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jPasswordField_LoginPWD, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                        .addComponent(jTextField_LoginTK))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(109, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField_LoginTK, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPasswordField_LoginPWD, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(48, 48, 48)
+                .addComponent(jToggleButtonLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(42, 42, 42))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jToggleButtonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonLoginActionPerformed
+        String taiKhoan = jTextField_LoginTK.getText();
+        String matKhau = new String(jPasswordField_LoginPWD.getPassword());
+        
+        if (taiKhoan.isEmpty() || matKhau.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin đăng nhập!");
+            return;
+        }
+        
+        TaiKhoanDTO tk = appData.getTaiKhoanBUS().dangNhap(taiKhoan, matKhau);
+        if (tk != null) {
+            MainFrame mainFrame = new MainFrame(tk);
+            mainFrame.setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Tài khoản hoặc mật khẩu không đúng!");
+        }
+    }//GEN-LAST:event_jToggleButtonLoginActionPerformed
 
     /**
      * @param args the command line arguments
@@ -75,7 +187,19 @@ public class LoginFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(LoginFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
+        
+       try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+            Color focusColor = new Color(24, 144, 255);
+            UIManager.put("Component.focusColor", focusColor);
+            UIManager.put("TextComponent.arc", 10);
+            UIManager.put("PasswordField.showRevealButton", true);
+            FlatMacLightLaf.setup();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+       
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -84,6 +208,14 @@ public class LoginFrame extends javax.swing.JFrame {
         });
     }
 
+    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPasswordField jPasswordField_LoginPWD;
+    private javax.swing.JTextField jTextField_LoginTK;
+    private javax.swing.JToggleButton jToggleButtonLogin;
     // End of variables declaration//GEN-END:variables
 }

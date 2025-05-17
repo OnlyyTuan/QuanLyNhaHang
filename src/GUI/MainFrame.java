@@ -1,32 +1,72 @@
+package GUI;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package GUI;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 
 import BUS.AppData;
 import BUS.BanAnBUS;
-
+import DTO.BanAnDTO;
+import DTO.TaiKhoanDTO;
+import GUI.Panel.SideMenu;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import GUI.Panel.*;
 /**
  *
  * @author MSI
  */
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends JFrame {
 
     private AppData appData;
-    BanAnBUS banAnBUS;
+    private BanAnBUS banAnBUS;
+    private TaiKhoanDTO taiKhoan;
+    private JPanel contentPanel;
+    private CardLayout cardLayout;
     
     /**
      * Creates new form MainFrame
      */
-    public MainFrame() {
+    public MainFrame(TaiKhoanDTO taiKhoan) {
+        this.taiKhoan = taiKhoan;
+        
         initComponents();
+        setTitle("Quản Lý Nhà Hàng");
+        setLocationRelativeTo(null);
+        setVisible(true);
+        setSize(1200, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        //
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        SideMenu sideMenu = new SideMenu();
+        contentPanel = new JPanel();
+        cardLayout = new CardLayout();
+        contentPanel.setLayout(cardLayout);
+        // Add content panels
+        contentPanel.add(new BanAn(), "BanAn");
+        contentPanel.add(new MonAn(),"MonAn");
+        contentPanel.add(new NhanVien(), "NhanVien");
+        contentPanel.add(new PhanQuyen(), "PhanQuyen");
+        contentPanel.add(new HoaDon(), "HoaDon");
+        contentPanel.add(new TaiKhoan(), "TaiKhoan");
+
+        sideMenu.setContentPanel(contentPanel, cardLayout);
+
+        add(sideMenu, BorderLayout.WEST);
+        add(contentPanel, BorderLayout.CENTER);
+
+
+
+
+
     }
 
-    public MainFrame(AppData appData) {
-        this.appData = appData;
-        banAnBUS = appData.getBanAnBUS();
-    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -36,21 +76,10 @@ public class MainFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
-        pack();
+        
+        
+        SideMenu sideMenu = new SideMenu();
+        add(sideMenu, BorderLayout.WEST);
     }// </editor-fold>//GEN-END:initComponents
 
 

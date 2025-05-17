@@ -12,6 +12,9 @@ public class HoaDonDTO {
     private Timestamp thoiGian;
     private String ghiChu;
 
+    public HoaDonDTO() {
+    }
+
     public HoaDonDTO(int id, int idBanAn, int idNhanVien, String tenKhach, int tongTien, Timestamp thoiGian, String ghiChu) {
         this.id = id;
         this.idBanAn = idBanAn;

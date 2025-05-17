@@ -17,9 +17,24 @@ public class CTHoaDonBUS {
         return this.cthdList;
     }
 
-    public ArrayList<CTHoaDonDTO> getAllByID(int hdId){
-        return cthdDAO.selectById(hdId);
+    public CTHoaDonDTO getByID(int id) {
+        for(CTHoaDonDTO cthd : cthdList) {
+            if(cthd.getId() == id) {
+                return cthd;
+            }
+        }
+        return null;
     }
     
+    public ArrayList<CTHoaDonDTO> getByHoaDonID(int hdId) {
+        ArrayList<CTHoaDonDTO> result = new ArrayList<>();
+        for(CTHoaDonDTO cthd : cthdList) {
+            if(cthd.getIdHoaDon() == hdId) {
+                result.add(cthd);
+            }
+        }
+        return result;
+    }
+
     
 }

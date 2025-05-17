@@ -37,13 +37,12 @@ public class NhanVienDAO {
         int result=0;
         try{
             Connection conn=(Connection) DBConnector.getConnection();
-            String query = "INSERT INTO nhanvien (id,hoTen,gioiTinh,chucVu,trangThai) VALUES (?,?,?,?,?)";
+            String query = "INSERT INTO nhanvien (hoTen,gioiTinh,chucVu,trangThai) VALUES (?,?,?,?)";
             PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, nv.getId());
-            pst.setString(2, nv.getHoTen());
-            pst.setString(3, nv.getGioiTinh());
-            pst.setString(4, nv.getChucVu());
-            pst.setInt(5, nv.getTrangThai());
+            pst.setString(1, nv.getHoTen());
+            pst.setString(2, nv.getGioiTinh());
+            pst.setString(3, nv.getChucVu());
+            pst.setInt(4, nv.getTrangThai());
             result = pst.executeUpdate();
             DBConnector.closeConnection(conn);
             

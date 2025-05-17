@@ -8,6 +8,9 @@ public class MonAnDTO {
     private String hinhAnh;
     private int trangThai;
 
+    public MonAnDTO() {
+    }
+    
     public MonAnDTO(int id, String ten, int idDanhMuc, int gia, String hinhAnh, int trangThai) {
         this.id = id;
         this.ten = ten;

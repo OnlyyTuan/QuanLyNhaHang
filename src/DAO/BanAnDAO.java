@@ -109,7 +109,7 @@ public class BanAnDAO {
         int result =0;
         try{
             Connection conn = (Connection) DBConnector.getConnection();
-            String query = "UPDATE banan SET trangThai=0 WHERE id=?";
+            String query = "DELETE FROM banan WHERE id = ?";
             PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
             pst.setInt(1, id);
             result = pst.executeUpdate();

@@ -20,8 +20,8 @@ public class DanhMucMonAnDAO {
             while(rs.next()){
                 int id = rs.getInt("id");
                 String ten = rs.getString("ten");
-                DanhMucMonAnDTO dmma = new DanhMucMonAnDTO(id,ten);
-                result.add(dmma);
+                DanhMucMonAnDTO dm = new DanhMucMonAnDTO(id, ten);
+                result.add(dm);
             }
             DBConnector.closeConnection(conn);
         } catch (Exception e) {

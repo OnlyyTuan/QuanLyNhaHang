@@ -34,10 +34,9 @@ public class QuyenDAO {
         int result = 0;
         try{
             Connection conn = (Connection) DBConnector.getConnection();
-            String query = "INSERT INTO quyen (id,ten) VALUES (?,?)";
+            String query = "INSERT INTO quyen (ten) VALUES (?)";
             PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, q.getId());
-            pst.setString(2, q.getTen());
+            pst.setString(1, q.getTen());
             result = pst.executeUpdate();
             DBConnector.closeConnection(conn);
         } catch (Exception e) {

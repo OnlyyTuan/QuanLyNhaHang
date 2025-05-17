@@ -16,6 +16,8 @@ public class NhanVienDTO {
     private String chucVu;
     private int trangThai;
     
+    public NhanVienDTO(){}
+
     public NhanVienDTO(int id, String hoTen, String gioiTinh, String chucVu, int trangThai){
         this.id=id;
         this.hoTen=hoTen;
