@@ -5,63 +5,88 @@ import DTO.HoaDonDTO;
 import java.util.ArrayList;
 
 public class HoaDonBUS {
-    private ArrayList<HoaDonDTO> listHoaDon;
+    private ArrayList<HoaDonDTO> hoaDonList;
     private HoaDonDAO hoaDonDAO;
 
     public HoaDonBUS() {
         hoaDonDAO = new HoaDonDAO();
-        listHoaDon = hoaDonDAO.getAllHoaDon();
+        loadData();
     }
 
-    // Lấy danh sách hóa đơn đã load
-    public ArrayList<HoaDonDTO> getListHoaDon() {
-        return listHoaDon;
+    public void loadData() {
+        hoaDonList = hoaDonDAO.selectAll();
     }
 
-    // Thêm hóa đơn mới
-    public boolean addHoaDon(HoaDonDTO hd) {
-        if (hoaDonDAO.insertHoaDon(hd)) {
-            listHoaDon.add(hd);
-            return true;
-        }
-        return false;
+    public ArrayList<HoaDonDTO> getAll() {
+        return hoaDonList;
     }
 
-    // Xóa hóa đơn theo mã hóa đơn
-    public boolean deleteHoaDon(String maHoaDon) {
-        if (hoaDonDAO.deleteHoaDon(maHoaDon)) {
-            listHoaDon.removeIf(hd -> hd.getMaHoaDon().equals(maHoaDon));
-            return true;
-        }
-        return false;
-    }
-
-    // Cập nhật hóa đơn
-    public boolean updateHoaDon(HoaDonDTO hd) {
-        if (hoaDonDAO.updateHoaDon(hd)) {
-            for (int i = 0; i < listHoaDon.size(); i++) {
-                if (listHoaDon.get(i).getMaHoaDon().equals(hd.getMaHoaDon())) {
-                    listHoaDon.set(i, hd);
-                    break;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    // Tìm hóa đơn theo mã hóa đơn
-    public HoaDonDTO getHoaDonByMa(String maHoaDon) {
-        for (HoaDonDTO hd : listHoaDon) {
-            if (hd.getMaHoaDon().equals(maHoaDon)) {
-                return hd;
+    public boolean add(HoaDonDTO hd) {
+        for (HoaDonDTO existing : hoaDonList) {
+            if (existing.getId() == hd.getId()) {
+                System.out.println("❌ ID hoá đơn đã tồn tại!");
+                return false;
             }
         }
-        return null;
+
+        int result = hoaDonDAO.insert(hd);
+        if (result > 0) {
+            loadData();
+            System.out.println("✅ Thêm hoá đơn thành công!");
+            return true;
+        } else {
+            System.out.println("❌ Thêm hoá đơn thất bại!");
+            return false;
+        }
     }
 
-    // Làm mới dữ liệu từ DB
-    public void refresh() {
-        listHoaDon = hoaDonDAO.getAllHoaDon();
+    public boolean update(HoaDonDTO hd) {
+        boolean found = false;
+        for (HoaDonDTO existing : hoaDonList) {
+            if (existing.getId() == hd.getId()) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("❌ Không tìm thấy hoá đơn để cập nhật!");
+            return false;
+        }
+
+        int result = hoaDonDAO.update(hd);
+        if (result > 0) {
+            loadData();
+            System.out.println("✅ Cập nhật hoá đơn thành công!");
+            return true;
+        } else {
+            System.out.println("❌ Cập nhật hoá đơn thất bại!");
+            return false;
+        }
+    }
+
+    public boolean delete(int id) {
+        boolean found = false;
+        for (HoaDonDTO existing : hoaDonList) {
+            if (existing.getId() == id) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("❌ Không tìm thấy hoá đơn để xoá!");
+            return false;
+        }
+
+        int result = hoaDonDAO.delete(id);
+        if (result > 0) {
+            loadData();
+            System.out.println("✅ Xoá hoá đơn thành công!");
+            return true;
+        } else {
+            System.out.println("❌ Xoá hoá đơn thất bại!");
+            return false;
+        }
     }
 }

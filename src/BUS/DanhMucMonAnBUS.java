@@ -5,64 +5,88 @@ import DTO.DanhMucMonAnDTO;
 import java.util.ArrayList;
 
 public class DanhMucMonAnBUS {
-
-    private ArrayList<DanhMucMonAnDTO> danhMucMonAnList;
-    private DanhMucMonAnDAO danhMucMonAnDAO;
+    private ArrayList<DanhMucMonAnDTO> danhMucList;
+    private DanhMucMonAnDAO danhMucDAO;
 
     public DanhMucMonAnBUS() {
-        danhMucMonAnDAO = new DanhMucMonAnDAO();
-        danhMucMonAnList = danhMucMonAnDAO.getAllDanhMuc();
+        danhMucDAO = new DanhMucMonAnDAO();
+        loadData();
     }
 
-    // Lấy tất cả danh mục (dữ liệu lấy từ ArrayList đã load)
-    public ArrayList<DanhMucMonAnDTO> getDanhMucMonAnList() {
-        return danhMucMonAnList;
+    public void loadData() {
+        danhMucList = danhMucDAO.selectAll();
     }
 
-    // Thêm danh mục mới
-    public boolean addDanhMuc(DanhMucMonAnDTO dm) {
-        if (danhMucMonAnDAO.insertDanhMuc(dm)) {
-            danhMucMonAnList.add(dm);
-            return true;
-        }
-        return false;
+    public ArrayList<DanhMucMonAnDTO> getAll() {
+        return danhMucList;
     }
 
-    // Xóa danh mục
-    public boolean deleteDanhMuc(String maDanhMuc) {
-        if (danhMucMonAnDAO.deleteDanhMuc(maDanhMuc)) {
-            danhMucMonAnList.removeIf(dm -> dm.getMaDanhMuc().equals(maDanhMuc));
-            return true;
-        }
-        return false;
-    }
-
-    // Cập nhật danh mục
-    public boolean updateDanhMuc(DanhMucMonAnDTO dm) {
-        if (danhMucMonAnDAO.updateDanhMuc(dm)) {
-            for (int i = 0; i < danhMucMonAnList.size(); i++) {
-                if (danhMucMonAnList.get(i).getMaDanhMuc().equals(dm.getMaDanhMuc())) {
-                    danhMucMonAnList.set(i, dm);
-                    break;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    // Tìm danh mục theo mã
-    public DanhMucMonAnDTO getDanhMucByMa(String maDanhMuc) {
-        for (DanhMucMonAnDTO dm : danhMucMonAnList) {
-            if (dm.getMaDanhMuc().equals(maDanhMuc)) {
-                return dm;
+    public boolean add(DanhMucMonAnDTO dm) {
+        for (DanhMucMonAnDTO existing : danhMucList) {
+            if (existing.getId() == dm.getId()) {
+                System.out.println("❌ Mã danh mục đã tồn tại!");
+                return false;
             }
         }
-        return null;
+
+        int result = danhMucDAO.insert(dm);
+        if (result > 0) {
+            loadData();
+            System.out.println("✅ Thêm danh mục thành công!");
+            return true;
+        } else {
+            System.out.println("❌ Thêm danh mục thất bại!");
+            return false;
+        }
     }
 
-    // Làm mới dữ liệu từ DB (nếu muốn cập nhật danh sách mới nhất từ DB)
-    public void refresh() {
-        danhMucMonAnList = danhMucMonAnDAO.getAllDanhMuc();
+    public boolean update(DanhMucMonAnDTO dm) {
+        boolean found = false;
+        for (DanhMucMonAnDTO existing : danhMucList) {
+            if (existing.getId() == dm.getId()) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("❌ Không tìm thấy danh mục để cập nhật!");
+            return false;
+        }
+
+        int result = danhMucDAO.update(dm);
+        if (result > 0) {
+            loadData();
+            System.out.println("✅ Cập nhật danh mục thành công!");
+            return true;
+        } else {
+            System.out.println("❌ Cập nhật danh mục thất bại!");
+            return false;
+        }
+    }
+
+    public boolean delete(int id) {
+        boolean found = false;
+        for (DanhMucMonAnDTO existing : danhMucList) {
+            if (existing.getId() == id) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("❌ Không tìm thấy danh mục để xoá!");
+            return false;
+        }
+
+        int result = danhMucDAO.delete(id);
+        if (result > 0) {
+            loadData();
+            System.out.println("✅ Xoá danh mục thành công!");
+            return true;
+        } else {
+            System.out.println("❌ Xoá danh mục thất bại!");
+            return false;
+        }
     }
 }
