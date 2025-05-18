@@ -34,21 +34,9 @@ public class BanAnBUS {
     }
     
     public List<BanAnDTO> getList_banAn() {
-        List<BanAnDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM banan";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                list.add(new BanAnDTO(
-                    rs.getInt("id"),
-                    rs.getString("ten"),
-                    rs.getInt("trangThai")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
+        // Refresh the list from database
+        list_banAn = dao_banAn.selectAll();
+        return list_banAn;
     }
 
     public BanAnDAO getDao_banAn() {
@@ -71,10 +59,8 @@ public class BanAnBUS {
         }
         
         if (dao_banAn.insert(newBanAn) != 0) {
-            //Lay ID cua phan tu cuoi +1 len de co id cho phan tu moi trong bo nho
-            int newID = list_banAn.getLast().getId() + 1;
-            newBanAn.setId(newID);
-            list_banAn.add(newBanAn);
+            // Refresh the list after adding
+            list_banAn = dao_banAn.selectAll();
             return new Result(true, "Thêm bàn ăn mới thành công");
         }
         
@@ -91,13 +77,16 @@ public class BanAnBUS {
     
     public Result update(BanAnDTO banAn) {
         if(dao_banAn.update(banAn) != 0) {
-            list_banAn.set(getIndexById(banAn.getId()), banAn);
+            // Refresh the list after updating
+            list_banAn = dao_banAn.selectAll();
             return new Result(true, "Cập nhật bàn ăn thành công");
         }
         return new Result(false, "Cập nhật bàn ăn thất bại");
     }
 
     public BanAnDTO getByID(int id) {
+        // Refresh the list before getting by ID
+        list_banAn = dao_banAn.selectAll();
         for(BanAnDTO i : list_banAn) {
             if(i.getId() == id)
                 return i;

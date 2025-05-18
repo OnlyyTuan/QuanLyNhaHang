@@ -14,6 +14,11 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
+import javax.swing.ImageIcon;
+import java.awt.Image;
 
 /**
  *
@@ -70,6 +75,8 @@ public class MonAnDialog extends javax.swing.JDialog {
         jLabel5 = new javax.swing.JLabel();
         jComboBoxTrangThai = new javax.swing.JComboBox<>();
         jButtonThem = new javax.swing.JButton();
+        jButtonChonHinh = new javax.swing.JButton();
+        jLabelHinhAnh = new javax.swing.JLabel();
 
         jLabel1.setText("Tên món ăn:");
         jLabel2.setText("Danh mục:");
@@ -83,6 +90,13 @@ public class MonAnDialog extends javax.swing.JDialog {
         jButtonThem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonThemActionPerformed(evt);
+            }
+        });
+
+        jButtonChonHinh.setText("Chọn hình");
+        jButtonChonHinh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonChonHinhActionPerformed(evt);
             }
         });
 
@@ -103,7 +117,10 @@ public class MonAnDialog extends javax.swing.JDialog {
                     .addComponent(jTextFieldTen)
                     .addComponent(jComboBoxDanhMuc, 0, 250, Short.MAX_VALUE)
                     .addComponent(jTextFieldGia)
-                    .addComponent(jTextFieldHinhAnh)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextFieldHinhAnh)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonChonHinh))
                     .addComponent(jComboBoxTrangThai, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(30, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -129,7 +146,8 @@ public class MonAnDialog extends javax.swing.JDialog {
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextFieldHinhAnh, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextFieldHinhAnh, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonChonHinh, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -151,7 +169,7 @@ public class MonAnDialog extends javax.swing.JDialog {
             
             monAn.setGia(Integer.parseInt(jTextFieldGia.getText()));
             monAn.setHinhAnh(jTextFieldHinhAnh.getText());
-            monAn.setTrangThai(jComboBoxTrangThai.getSelectedIndex());
+            monAn.setTrangThai(jComboBoxTrangThai.getSelectedIndex() == 0 ? 1 : 0);
 
             Result result = monAnBUS.add(monAn);
             if (result.isSuccess()) {
@@ -167,6 +185,83 @@ public class MonAnDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButtonThemActionPerformed
 
+    private void jButtonChonHinhActionPerformed(java.awt.event.ActionEvent evt) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+                String extension = getExtension(f);
+                if (extension != null) {
+                    return extension.equals("jpg") || extension.equals("jpeg") || 
+                           extension.equals("png") || extension.equals("gif");
+                }
+                return false;
+            }
+            
+            public String getDescription() {
+                return "Image Files (*.jpg, *.jpeg, *.png, *.gif)";
+            }
+            
+            private String getExtension(File f) {
+                String ext = null;
+                String s = f.getName();
+                int i = s.lastIndexOf('.');
+                if (i > 0 && i < s.length() - 1) {
+                    ext = s.substring(i + 1).toLowerCase();
+                }
+                return ext;
+            }
+        });
+        
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            // Lưu hình ảnh vào thư mục images trong project
+            try {
+                String projectPath = System.getProperty("user.dir");
+                String imagesDir = projectPath + File.separator + "images";
+                File imagesFolder = new File(imagesDir);
+                if (!imagesFolder.exists()) {
+                    imagesFolder.mkdir();
+                }
+                
+                // Tạo tên file mới với timestamp để tránh trùng lặp
+                String newFileName = "food_" + System.currentTimeMillis() + "." + getExtension(selectedFile);
+                File destFile = new File(imagesDir + File.separator + newFileName);
+                
+                // Copy file
+                java.nio.file.Files.copy(selectedFile.toPath(), destFile.toPath(), 
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                
+                // Lưu đường dẫn tương đối vào database
+                jTextFieldHinhAnh.setText("images/" + newFileName);
+                
+                // Hiển thị preview
+                ImageIcon icon = new ImageIcon(destFile.getPath());
+                Image image = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                jLabelHinhAnh.setIcon(new ImageIcon(image));
+                
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, 
+                    "Lỗi khi lưu hình ảnh: " + e.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private String getExtension(File f) {
+        String ext = null;
+        String s = f.getName();
+        int i = s.lastIndexOf('.');
+        if (i > 0 && i < s.length() - 1) {
+            ext = s.substring(i + 1).toLowerCase();
+        }
+        return ext;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonThem;
     private javax.swing.JComboBox<DanhMucMonAnDTO> jComboBoxDanhMuc;
@@ -179,5 +274,7 @@ public class MonAnDialog extends javax.swing.JDialog {
     private javax.swing.JTextField jTextFieldGia;
     private javax.swing.JTextField jTextFieldHinhAnh;
     private javax.swing.JTextField jTextFieldTen;
+    private javax.swing.JButton jButtonChonHinh;
+    private javax.swing.JLabel jLabelHinhAnh;
     // End of variables declaration//GEN-END:variables
 }

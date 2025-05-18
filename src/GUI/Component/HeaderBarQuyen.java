@@ -4,11 +4,13 @@
  */
 package GUI.Component;
 
-import javax.swing.JPanel;
-import GUI.Dialog.BanAnDialog;
-import GUI.Panel.BanAn;
 import GUI.Panel.PhanQuyen;
 import GUI.Dialog.QuyenDialog;
+import javax.swing.JOptionPane;
+import BUS.QuyenBUS;
+import DTO.QuyenDTO;
+import config.DBConnector;
+import helper.JTableExporter;
 /**
  *
  * @author MSI
@@ -48,9 +50,24 @@ public class HeaderBarQuyen extends javax.swing.JPanel {
 
         jTextFieldSearchBar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTextFieldSearchBar.setText("Tìm kiếm");
+        jTextFieldSearchBar.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().equals("Tìm kiếm")) {
+                    jTextFieldSearchBar.setText("");
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().isEmpty()) {
+                    jTextFieldSearchBar.setText("Tìm kiếm");
+                }
+            }
+        });
 
         jComboBoxSearchType.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
+            "ID", 
+            "Tên quyền"
+        }));
         jComboBoxSearchType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSearchTypeActionPerformed(evt);
@@ -113,7 +130,20 @@ public class HeaderBarQuyen extends javax.swing.JPanel {
         });
 
         jButtonExport.setText("Export");
-
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (phanQuyenPanel != null) {
+                    try {
+                        JTableExporter.exportJTableToExcel(phanQuyenPanel.getTable());
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, 
+                            "Lỗi khi xuất file Excel: " + e.getMessage(), 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
         jButtonImport.setText("Import");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -172,7 +202,15 @@ public class HeaderBarQuyen extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSearchTypeActionPerformed
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-        // TODO add your handling code here:
+        if (phanQuyenPanel != null) {
+            String searchText = jTextFieldSearchBar.getText().trim();
+            if (searchText.equals("Tìm kiếm")) {
+                searchText = "";
+            }
+            
+            String searchType = jComboBoxSearchType.getSelectedItem().toString();
+            phanQuyenPanel.searchQuyen(searchText, searchType);
+        }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
@@ -191,9 +229,25 @@ public class HeaderBarQuyen extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButtonAddActionPerformed
 
-    private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButtonModifyActionPerformed
+    private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {
+        if (phanQuyenPanel != null) {
+            int selectedId = phanQuyenPanel.getSelectedTableId();
+            if (selectedId == -1) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn quyền cần sửa", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Lấy thông tin quyền được chọn
+            QuyenBUS quyenBUS = new QuyenBUS(DBConnector.getConnection());
+            QuyenDTO selectedQuyen = quyenBUS.getById(selectedId);
+            
+            if (selectedQuyen != null) {
+                QuyenDialog dialog = new QuyenDialog(selectedQuyen);
+                dialog.setVisible(true);
+                phanQuyenPanel.loadTableData();
+            }
+        }
+    }
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
         // TODO add your handling code here:
@@ -204,6 +258,9 @@ public class HeaderBarQuyen extends javax.swing.JPanel {
 
     private void jButtonDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDetailActionPerformed
         // TODO add your handling code here:
+        if (phanQuyenPanel != null) {
+            phanQuyenPanel.openDetailDialog();
+        }
     }//GEN-LAST:event_jButtonDetailActionPerformed
 
 

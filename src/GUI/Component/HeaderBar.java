@@ -7,6 +7,10 @@ package GUI.Component;
 import javax.swing.JPanel;
 import GUI.Dialog.BanAnDialog;
 import GUI.Panel.BanAn;
+import javax.swing.JOptionPane;
+import DTO.BanAnDTO;
+import GUI.Dialog.BAdetailDialog;
+import helper.JTableExporter;
 /**
  *
  * @author MSI
@@ -46,9 +50,24 @@ public class HeaderBar extends javax.swing.JPanel {
 
         jTextFieldSearchBar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTextFieldSearchBar.setText("Tìm kiếm");
+        jTextFieldSearchBar.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().equals("Tìm kiếm")) {
+                    jTextFieldSearchBar.setText("");
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().isEmpty()) {
+                    jTextFieldSearchBar.setText("Tìm kiếm");
+                }
+            }
+        });
 
         jComboBoxSearchType.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
+            "ID", 
+            "Tên bàn" 
+        }));
         jComboBoxSearchType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSearchTypeActionPerformed(evt);
@@ -104,9 +123,28 @@ public class HeaderBar extends javax.swing.JPanel {
         });
 
         jButtonDetail.setText("Chi tiết");
+        jButtonDetail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDetailActionPerformed(evt);
+            }
+        });
 
         jButtonExport.setText("Export");
-
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (banAnPanel != null) {
+                    try {
+                        JTableExporter.exportJTableToExcel(banAnPanel.getTable());
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, 
+                            "Lỗi khi xuất file Excel: " + e.getMessage(), 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        
         jButtonImport.setText("Import");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -169,7 +207,15 @@ public class HeaderBar extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSearchTypeActionPerformed
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-        // TODO add your handling code here:
+        if (banAnPanel != null) {
+            String searchText = jTextFieldSearchBar.getText().trim();
+            if (searchText.equals("Tìm kiếm")) {
+                searchText = "";
+            }
+            
+            String searchType = jComboBoxSearchType.getSelectedItem().toString();
+            banAnPanel.searchTable(searchText, searchType);
+        }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
@@ -188,6 +234,9 @@ public class HeaderBar extends javax.swing.JPanel {
 
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
         // TODO add your handling code here:
+        if (banAnPanel != null) {
+            banAnPanel.openModifyDialog();
+        }
     }//GEN-LAST:event_jButtonModifyActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
@@ -196,6 +245,21 @@ public class HeaderBar extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
+    private void jButtonDetailActionPerformed(java.awt.event.ActionEvent evt) {
+        BanAn panel = (BanAn) this.getParent();
+        int selectedId = panel.getSelectedTableId();
+        
+        if (selectedId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn bàn cần xem chi tiết!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        BanAnDTO banAn = panel.getBanAnBUS().getByID(selectedId);
+        if (banAn != null) {
+            BAdetailDialog dialog = new BAdetailDialog((javax.swing.JFrame) this.getTopLevelAncestor(), banAn);
+            dialog.setVisible(true);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;

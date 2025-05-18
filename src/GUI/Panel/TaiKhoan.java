@@ -6,12 +6,14 @@ package GUI.Panel;
 
 import java.sql.Connection;
 import java.util.List;
-
+import GUI.Dialog.TKdetailDialog;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import config.DBConnector;
 import DTO.TaiKhoanDTO;
 import BUS.TaiKhoanBUS;
+import GUI.Dialog.TaiKhoanDialog;
+import java.util.ArrayList;
 
 /**
  *
@@ -26,9 +28,9 @@ public class TaiKhoan extends javax.swing.JPanel {
      */
     public TaiKhoan() {
         initComponents();
-        loadTableData();
         Connection conn = DBConnector.getConnection();
         taiKhoanBUS = new TaiKhoanBUS(conn);
+        loadTableData();
         setupTaiKhoanSelection();
     }
 
@@ -48,9 +50,8 @@ public class TaiKhoan extends javax.swing.JPanel {
     public int getSelectedTableId() {
         return selectedTableId;
     }
+
     public void loadTableData() {
-        Connection conn = DBConnector.getConnection();
-        TaiKhoanBUS taiKhoanBUS = new TaiKhoanBUS(conn);
         List<TaiKhoanDTO> list = taiKhoanBUS.getListTaiKhoan();
     
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -64,6 +65,57 @@ public class TaiKhoan extends javax.swing.JPanel {
                 tk.getMatKhau(),
                 trangThai
             });
+        }
+    }
+
+    public void openAddDialog() {
+        TaiKhoanDialog dialog = new TaiKhoanDialog();
+        dialog.setVisible(true);
+        
+        // Refresh table data after dialog is closed
+        loadTableData();
+        
+        // Select the last row (newly added account)
+        if (jTable1.getRowCount() > 0) {
+            int lastRow = jTable1.getRowCount() - 1;
+            jTable1.setRowSelectionInterval(lastRow, lastRow);
+            jTable1.scrollRectToVisible(jTable1.getCellRect(lastRow, 0, true));
+        }
+    }
+
+    public void openDetailDialog() {
+        if (selectedTableId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn tài khoản cần xem chi tiết!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        TaiKhoanDTO taiKhoan = taiKhoanBUS.getById(selectedTableId);
+        if (taiKhoan != null) {
+            TKdetailDialog dialog = new TKdetailDialog((javax.swing.JFrame) this.getTopLevelAncestor(), taiKhoan);
+            dialog.setVisible(true);
+        }
+    }
+
+    public void openModifyDialog() {
+        if (selectedTableId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn tài khoản cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        TaiKhoanDTO taiKhoan = taiKhoanBUS.getById(selectedTableId);
+        if (taiKhoan != null) {
+            TaiKhoanDialog dialog = new TaiKhoanDialog(taiKhoan);
+            dialog.setVisible(true);
+            
+            if (dialog.isModified()) {
+                loadTableData();
+                // Reselect the modified account
+                for (int i = 0; i < jTable1.getRowCount(); i++) {
+                    if ((int)jTable1.getValueAt(i, 0) == selectedTableId) {
+                        jTable1.setRowSelectionInterval(i, i);
+                        jTable1.scrollRectToVisible(jTable1.getCellRect(i, 0, true));
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -89,12 +141,75 @@ public class TaiKhoan extends javax.swing.JPanel {
                         "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi khi xóa tài khoản: " + ex.getMessage(), 
+                JOptionPane.showMessageDialog(this, ex.getMessage(), 
                     "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
         return false;
     }
+
+    public void searchTaiKhoan(String searchText, String searchType) {
+        List<TaiKhoanDTO> searchResults;
+        
+        if (searchText.isEmpty()) {
+            // Nếu không có từ khóa tìm kiếm, hiển thị tất cả
+            searchResults = taiKhoanBUS.getListTaiKhoan();
+        } else {
+            switch (searchType) {
+                case "ID":
+                    try {
+                        int searchId = Integer.parseInt(searchText);
+                        TaiKhoanDTO taiKhoan = taiKhoanBUS.getById(searchId);
+                        searchResults = new ArrayList<>();
+                        if (taiKhoan != null) {
+                            searchResults.add(taiKhoan);
+                        }
+                    } catch (NumberFormatException e) {
+                        searchResults = new ArrayList<>();
+                        JOptionPane.showMessageDialog(this, 
+                            "ID phải là số nguyên!", 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+                    
+                case "Tài khoản":
+                    searchResults = taiKhoanBUS.searchByUsername(searchText);
+                    break;
+                    
+                default:
+                    searchResults = taiKhoanBUS.getListTaiKhoan();
+                    break;
+            }
+        }
+        
+        // Cập nhật bảng với kết quả tìm kiếm
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        
+        for (TaiKhoanDTO tk : searchResults) {
+            String trangThai = (tk.getTrangThai() == 1) ? "Hoạt động" : "Khóa";
+            model.addRow(new Object[]{
+                tk.getId(),
+                tk.getTenTaiKhoan(),
+                tk.getMatKhau(),
+                trangThai
+            });
+        }
+        
+        // Thông báo nếu không tìm thấy kết quả
+        if (searchResults.isEmpty() && !searchText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Không tìm thấy kết quả phù hợp!", 
+                "Thông báo", 
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public javax.swing.JTable getTable() {
+        return jTable1;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

@@ -14,17 +14,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import java.awt.CardLayout;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import GUI.LoginFrame;
 
 /**
  *
  * @author MSI
  */
 public class SideMenu extends javax.swing.JPanel {
-     private boolean isHovered = false;
+     
 
      private JPanel contentPanel;
      private CardLayout cardLayout;
      
+    private DTO.NhanVienDTO currentEmployee;
+
     /**
      * Creates new form SideMenu
      */
@@ -251,7 +256,18 @@ public class SideMenu extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogoutActionPerformed
-        // TODO add your handling code here:
+        // Clear current employee info
+        setCurrentEmployee(null);
+        
+        // Get the main frame
+        JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        
+        // Create and show login frame
+        LoginFrame loginFrame = new LoginFrame();
+        loginFrame.setVisible(true);
+        
+        // Close main frame
+        mainFrame.dispose();
     }//GEN-LAST:event_jButtonLogoutActionPerformed
 
     private void jButtonMonAnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMonAnActionPerformed
@@ -271,4 +287,19 @@ public class SideMenu extends javax.swing.JPanel {
     private javax.swing.JLabel jLabelTenNV;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
+
+    public void setCurrentEmployee(DTO.NhanVienDTO nhanVien) {
+        this.currentEmployee = nhanVien;
+        if (nhanVien != null) {
+            jLabelTenNV.setText(nhanVien.getHoTen());
+            jLabelChucVu.setText(nhanVien.getChucVu());
+        } else {
+            jLabelTenNV.setText("Tên Nhân viên");
+            jLabelChucVu.setText("Chức vụ");
+        }
+    }
+
+    public DTO.NhanVienDTO getCurrentEmployee() {
+        return currentEmployee;
+    }
 }

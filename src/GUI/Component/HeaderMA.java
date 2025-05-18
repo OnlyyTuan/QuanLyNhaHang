@@ -9,6 +9,8 @@ import GUI.Dialog.BanAnDialog;
 import GUI.Panel.BanAn;
 import GUI.Panel.MonAn;
 import GUI.Dialog.MonAnDialog;
+import javax.swing.JOptionPane;
+import helper.JTableExporter;
 /**
  *
  * @author MSI
@@ -48,9 +50,24 @@ public class HeaderMA extends javax.swing.JPanel {
 
         jTextFieldSearchBar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTextFieldSearchBar.setText("Tìm kiếm");
-
+        jTextFieldSearchBar.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().equals("Tìm kiếm")) {
+                    jTextFieldSearchBar.setText("");
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().isEmpty()) {
+                    jTextFieldSearchBar.setText("Tìm kiếm");
+                }
+            }
+        });
+        
         jComboBoxSearchType.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
+            "ID", 
+            "Tên món ăn" 
+        }));
         jComboBoxSearchType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSearchTypeActionPerformed(evt);
@@ -106,8 +123,27 @@ public class HeaderMA extends javax.swing.JPanel {
         });
 
         jButtonDetail3.setText("Chi tiết");
+        jButtonDetail3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDetail3ActionPerformed(evt);
+            }
+        });
 
         jButtonExport.setText("Export");
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (monAnPanel != null) {
+                    try {
+                        JTableExporter.exportJTableToExcel(monAnPanel.getTable());
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, 
+                            "Lỗi khi xuất file Excel: " + e.getMessage(), 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
 
         jButtonImport.setText("Import");
 
@@ -167,7 +203,15 @@ public class HeaderMA extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSearchTypeActionPerformed
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-        // TODO add your handling code here:
+        if (monAnPanel != null) {
+            String searchText = jTextFieldSearchBar.getText().trim();
+            if (searchText.equals("Tìm kiếm")) {
+                searchText = "";
+            }
+            
+            String searchType = jComboBoxSearchType.getSelectedItem().toString();
+            monAnPanel.searchMonAn(searchText, searchType);
+        }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
@@ -186,6 +230,9 @@ public class HeaderMA extends javax.swing.JPanel {
 
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
         // TODO add your handling code here:
+        if (monAnPanel != null) {
+            monAnPanel.openModifyDialog();
+        }
     }//GEN-LAST:event_jButtonModifyActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
@@ -194,6 +241,13 @@ public class HeaderMA extends javax.swing.JPanel {
             monAnPanel.deleteTable(monAnPanel.getSelectedTableId());
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
+
+    private void jButtonDetail3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDetail3ActionPerformed
+        // TODO add your handling code here:
+        if (monAnPanel != null) {
+            monAnPanel.openDetailDialog();
+        }
+    }//GEN-LAST:event_jButtonDetail3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

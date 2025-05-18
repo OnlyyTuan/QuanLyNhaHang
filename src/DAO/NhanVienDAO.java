@@ -131,6 +131,64 @@ public class NhanVienDAO {
         return result;
     }
 
-    
+    public List<NhanVienDTO> searchByName(String name) {
+        List<NhanVienDTO> allNhanVien = getListNhanVien();
+        List<NhanVienDTO> results = new ArrayList<>();
+        
+        for (NhanVienDTO nv : allNhanVien) {
+            if (nv.getHoTen() != null && 
+                nv.getHoTen().toLowerCase().contains(name.toLowerCase())) {
+                results.add(nv);
+            }
+        }
+        
+        return results;
+    }
+
+    public List<NhanVienDTO> getListNhanVien() {
+        List<NhanVienDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM nhanvien";
+        try {
+            Connection conn = (Connection) DBConnector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(new NhanVienDTO(
+                    rs.getInt("id"),
+                    rs.getString("hoTen"),
+                    rs.getString("gioiTinh"),
+                    rs.getString("chucVu"),
+                    rs.getInt("trangThai")
+                ));
+            }
+            DBConnector.closeConnection(conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public NhanVienDTO getById(int id) {
+        String sql = "SELECT * FROM nhanvien WHERE id = ?";
+        try {
+            Connection conn = (Connection) DBConnector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new NhanVienDTO(
+                    rs.getInt("id"),
+                    rs.getString("hoTen"),
+                    rs.getString("gioiTinh"),
+                    rs.getString("chucVu"),
+                    rs.getInt("trangThai")
+                );
+            }
+            DBConnector.closeConnection(conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 

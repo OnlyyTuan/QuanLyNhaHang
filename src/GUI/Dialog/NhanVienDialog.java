@@ -21,7 +21,7 @@ public class NhanVienDialog extends javax.swing.JDialog {
     public NhanVienDialog() {
         initComponents();
         setTitle("Nhân Viên Dialog");
-        setSize(501, 274);
+        setSize(500, 300);
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -38,7 +38,7 @@ public class NhanVienDialog extends javax.swing.JDialog {
         jTextFieldNameNV = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextFieldTrangThai = new javax.swing.JTextField();
+        jComboBoxTrangThai = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
@@ -57,6 +57,12 @@ public class NhanVienDialog extends javax.swing.JDialog {
         jComboBoxChucVu.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
             "Quản lý", 
             "Nhân viên" 
+        }));
+
+        // Add status options to combo box
+        jComboBoxTrangThai.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
+            "Hoạt động", 
+            "Không hoạt động" 
         }));
 
         jButton1.setText("Thêm");
@@ -92,7 +98,7 @@ public class NhanVienDialog extends javax.swing.JDialog {
                         .addGap(68, 68, 68)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
-                            .addComponent(jTextFieldTrangThai, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboBoxTrangThai, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5)
                             .addComponent(jComboBoxChucVu, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
@@ -110,7 +116,7 @@ public class NhanVienDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldNameNV, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextFieldTrangThai, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBoxTrangThai, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -129,33 +135,28 @@ public class NhanVienDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        try{
-        Connection conn = DBConnector.getConnection();
-        NhanVienDTO nvDTO = new NhanVienDTO();
-        
-        nvDTO.setHoTen(jTextFieldNameNV.getText());
-        nvDTO.setGioiTinh(jRadioButton1.isSelected() ? "Nam" : "Nữ");
-        nvDTO.setChucVu(jComboBoxChucVu.getSelectedItem().toString());
-        nvDTO.setTrangThai(Integer.parseInt(jTextFieldTrangThai.getText()));
+        try {
+            Connection conn = DBConnector.getConnection();
+            NhanVienDTO nvDTO = new NhanVienDTO();
+            
+            nvDTO.setHoTen(jTextFieldNameNV.getText());
+            nvDTO.setGioiTinh(jRadioButton1.isSelected() ? "Nam" : "Nữ");
+            nvDTO.setChucVu(jComboBoxChucVu.getSelectedItem().toString());
+            // Convert status text to integer
+            nvDTO.setTrangThai(jComboBoxTrangThai.getSelectedItem().toString().equals("Hoạt động") ? 1 : 0);
 
-        NhanVienBUS nvBUS = new NhanVienBUS(conn);
-        Result result = nvBUS.add(nvDTO);
-        
-        if (result.isSuccess()) {
-            this.dispose();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, result.getMessage());
+            NhanVienBUS nvBUS = new NhanVienBUS(conn);
+            Result result = nvBUS.add(nvDTO);
+            
+            if (result.isSuccess()) {
+                this.dispose();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, result.getMessage());
+            }
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + e.getMessage());
         }
-    }catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng nhập trạng thái là số (0 hoặc 1)");
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + e.getMessage());
-    }
-}
-        
-    //GEN-LAST:event_jButton1ActionPerformed
-
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -166,7 +167,7 @@ public class NhanVienDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JTextField jTextFieldNameNV;
-    private javax.swing.JTextField jTextFieldTrangThai;
     private javax.swing.JComboBox<String> jComboBoxChucVu;
+    private javax.swing.JComboBox<String> jComboBoxTrangThai;
     // End of variables declaration//GEN-END:variables
 }

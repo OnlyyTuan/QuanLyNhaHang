@@ -6,15 +6,12 @@ package GUI;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-
 import BUS.AppData;
 import BUS.BanAnBUS;
-import DTO.BanAnDTO;
 import DTO.TaiKhoanDTO;
 import GUI.Panel.SideMenu;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import GUI.Panel.*;
 /**
  *
@@ -27,6 +24,7 @@ public class MainFrame extends JFrame {
     private TaiKhoanDTO taiKhoan;
     private JPanel contentPanel;
     private CardLayout cardLayout;
+    private SideMenu sideMenu;
     
     /**
      * Creates new form MainFrame
@@ -44,7 +42,7 @@ public class MainFrame extends JFrame {
         //
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        SideMenu sideMenu = new SideMenu();
+        sideMenu = new SideMenu();
         contentPanel = new JPanel();
         cardLayout = new CardLayout();
         contentPanel.setLayout(cardLayout);
@@ -62,11 +60,11 @@ public class MainFrame extends JFrame {
         add(contentPanel, BorderLayout.CENTER);
 
 
-
-
-
     }
 
+    public SideMenu getSideMenu() {
+        return sideMenu;
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.

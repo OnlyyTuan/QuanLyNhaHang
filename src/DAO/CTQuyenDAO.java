@@ -12,74 +12,70 @@ public class CTQuyenDAO {
     
     public ArrayList<CTQuyenDTO> selectAll(){
         ArrayList<CTQuyenDTO> result = new ArrayList<>();
-        try{
-            Connection conn = (Connection) DBConnector.getConnection();
-            String query = "SELECT * FROM ctquyen";
-            PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            ResultSet rs = (ResultSet) pst.executeQuery();
+        try {
+            Connection conn = DBConnector.getConnection();
+            String query = "SELECT * FROM chitietquyen";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
-                int idQuyen = rs.getInt("idQuyen");
-                int idChucNang = rs.getInt("idChucNang");
+                int idQuyen = rs.getInt("id_quyen");
+                int idChucNang = rs.getInt("id_chucNang");
                 String hanhDong = rs.getString("hanhDong");
                 CTQuyenDTO cq = new CTQuyenDTO(idQuyen,idChucNang,hanhDong);
                 result.add(cq);
             }
-            DBConnector.closeConnection(conn);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return result;
     }
 
     public int insert(CTQuyenDTO cq){
         int result = 0;
-        try{
-            Connection conn = (Connection) DBConnector.getConnection();
-            String query = "INSERT INTO ctquyen (idQuyen,idChucNang,hanhDong) VALUES (?,?,?)";
-            PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, cq.getIdQuyen());
-            pst.setInt(2, cq.getIdChucNang());
-            pst.setString(3, cq.getHanhDong());
-            result = pst.executeUpdate();
-            DBConnector.closeConnection(conn);
+        try {
+            Connection conn = DBConnector.getConnection();
+            String query = "INSERT INTO chitietquyen (id_quyen,id_chucNang,hanhDong) VALUES (?,?,?)";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, cq.getIdQuyen());
+            ps.setInt(2, cq.getIdChucNang());
+            ps.setString(3, cq.getHanhDong());
+            result = ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return result;
     }
 
     public CTQuyenDTO selectById(String t){
         CTQuyenDTO cq = null;
-        try{
-            Connection conn = (Connection) DBConnector.getConnection();
-            String query = "SELECT * FROM ctquyen WHERE idQuyen=?";
-            PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setString(1, t);
-            ResultSet rs = (ResultSet) pst.executeQuery();
+        try {
+            Connection conn = DBConnector.getConnection();
+            String query = "SELECT * FROM chitietquyen WHERE id_quyen=?";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, t);
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
-                int idQuyen = rs.getInt("idQuyen");
-                int idChucNang = rs.getInt("idChucNang");
+                int idQuyen = rs.getInt("id_quyen");
+                int idChucNang = rs.getInt("id_chucNang");
                 String hanhDong = rs.getString("hanhDong");
                 cq = new CTQuyenDTO(idQuyen,idChucNang,hanhDong);
             }
-            DBConnector.closeConnection(conn);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return cq;
     }
 
-    public int delete(int id){
+    public int delete(int idQuyen){
         int result = 0;
-        try{
-            Connection conn = (Connection) DBConnector.getConnection();
-            String query = "DELETE FROM ctquyen WHERE idQuyen=?";
-            PreparedStatement pst = (PreparedStatement) conn.prepareStatement(query);
-            pst.setInt(1, id);
-            result = pst.executeUpdate();
-            DBConnector.closeConnection(conn);
+        try {
+            Connection conn = DBConnector.getConnection();
+            String query = "DELETE FROM chitietquyen WHERE id_quyen=?";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, idQuyen);
+            result = ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return result;
     }

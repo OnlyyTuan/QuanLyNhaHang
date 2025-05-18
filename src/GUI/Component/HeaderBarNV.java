@@ -7,6 +7,10 @@ package GUI.Component;
 import javax.swing.JPanel;
 import GUI.Dialog.NhanVienDialog;
 import GUI.Panel.NhanVien;
+import javax.swing.JOptionPane;
+import DTO.NhanVienDTO;
+import GUI.Dialog.NVmodifyDialog;
+import helper.JTableExporter;
 /**
  *
  * @author MSI
@@ -53,14 +57,26 @@ public class HeaderBarNV extends javax.swing.JPanel {
 
         jTextFieldSearchBar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTextFieldSearchBar.setText("Tìm kiếm");
-        jTextFieldSearchBar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextFieldSearchBarActionPerformed(evt);
+        jTextFieldSearchBar.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().equals("Tìm kiếm")) {
+                    jTextFieldSearchBar.setText("");
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().isEmpty()) {
+                    jTextFieldSearchBar.setText("Tìm kiếm");
+                }
             }
         });
 
         jComboBoxSearchType.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
+            "ID", 
+            "Tên nhân viên",
+            "Giới tính",
+            "Chức vụ"
+        }));
         jComboBoxSearchType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSearchTypeActionPerformed(evt);
@@ -115,10 +131,25 @@ public class HeaderBarNV extends javax.swing.JPanel {
             }
         });
 
-        jButtonImport.setText("Import");
+        
 
         jButtonExport.setText("Export");
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (nhanVienPanel != null) {
+                    try {
+                        JTableExporter.exportJTableToExcel(nhanVienPanel.getTable());
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, 
+                            "Lỗi khi xuất file Excel: " + e.getMessage(), 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
 
+        jButtonImport.setText("Import");
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -142,14 +173,12 @@ public class HeaderBarNV extends javax.swing.JPanel {
                         .addComponent(jButtonDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonDetail)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonExport)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonImport)
-                        .addGap(18, 18, 18))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jButtonImport))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -177,7 +206,15 @@ public class HeaderBarNV extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSearchTypeActionPerformed
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-        // TODO add your handling code here:
+        if (nhanVienPanel != null) {
+            String searchText = jTextFieldSearchBar.getText().trim();
+            if (searchText.equals("Tìm kiếm")) {
+                searchText = "";
+            }
+            
+            String searchType = jComboBoxSearchType.getSelectedItem().toString();
+            nhanVienPanel.searchNhanVien(searchText, searchType);
+        }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
@@ -196,6 +233,9 @@ public class HeaderBarNV extends javax.swing.JPanel {
 
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
         // TODO add your handling code here:
+        if (nhanVienPanel != null) {
+            nhanVienPanel.openModifyDialog();
+        }
     }//GEN-LAST:event_jButtonModifyActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
@@ -207,6 +247,9 @@ public class HeaderBarNV extends javax.swing.JPanel {
 
     private void jButtonDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDetailActionPerformed
         // TODO add your handling code here:
+        if (nhanVienPanel != null) {
+            nhanVienPanel.openDetailDialog();
+        }
     }//GEN-LAST:event_jButtonDetailActionPerformed
 
     private void jTextFieldSearchBarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldSearchBarActionPerformed

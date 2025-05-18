@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class QuyenBUS {
@@ -24,23 +23,14 @@ public class QuyenBUS {
     }
 
     public List<QuyenDTO> getListQuyen() {
-        List<QuyenDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM quyen";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                list.add(new QuyenDTO(
-                    rs.getInt("id"),
-                    rs.getString("ten")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
+        // Refresh the list from database
+        listQuyen = daoQuyen.selectAll();
+        return listQuyen;
     }
 
     public QuyenDTO getById(int id) {
+        // Refresh the list before getting by ID
+        listQuyen = daoQuyen.selectAll();
         for (QuyenDTO q : listQuyen) {
             if (q.getId() == id) {
                 return q;
@@ -57,10 +47,12 @@ public class QuyenBUS {
         int res = daoQuyen.insert(q);
         if (res != 0) {
             // Get the newly inserted role with its auto-generated ID
-            QuyenDTO newQuyen = daoQuyen.selectById(String.valueOf(daoQuyen.getAutoIncrement() - 1));
+            int newId = daoQuyen.getAutoIncrement() - 1;
+            QuyenDTO newQuyen = daoQuyen.selectById(String.valueOf(newId));
             if (newQuyen != null) {
-                listQuyen.add(newQuyen);
-                return new Result(true, "Thêm quyền thành công");
+                // Refresh the list after adding
+                listQuyen = daoQuyen.selectAll();
+                return new Result(true, "Thêm quyền thành công", newId);
             }
         }
         return new Result(false, "Thêm quyền thất bại");
@@ -78,13 +70,8 @@ public class QuyenBUS {
 
         int res = daoQuyen.update(q);
         if (res != 0) {
-            // Cập nhật trong bộ nhớ
-            for (int i = 0; i < listQuyen.size(); i++) {
-                if (listQuyen.get(i).getId() == q.getId()) {
-                    listQuyen.set(i, q);
-                    break;
-                }
-            }
+            // Refresh the list after updating
+            listQuyen = daoQuyen.selectAll();
             return new Result(true, "Cập nhật quyền thành công");
         }
         return new Result(false, "Cập nhật quyền thất bại");
@@ -92,14 +79,38 @@ public class QuyenBUS {
 
     public boolean delete(int id) {
         try {
-            return daoQuyen.delete(id) > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            // Check if the role is being used by any accounts
+            String sql = "SELECT COUNT(*) FROM taikhoan WHERE id_quyen = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, id);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    throw new RuntimeException("Không thể xóa quyền này vì đang được sử dụng bởi tài khoản");
+                }
+            }
+
+            // Delete associated permissions from ctquyen table first
+            sql = "DELETE FROM chitietquyen WHERE id_quyen = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, id);
+                stmt.executeUpdate();
+            }
+
+            // Then delete the role
+            boolean result = daoQuyen.delete(id) > 0;
+            if (result) {
+                // Refresh the list after deleting
+                listQuyen = daoQuyen.selectAll();
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi xóa quyền: " + e.getMessage());
         }
     }
 
     public ArrayList<QuyenDTO> searchByName(String keyword) {
+        // Refresh the list before searching
+        listQuyen = daoQuyen.selectAll();
         ArrayList<QuyenDTO> result = new ArrayList<>();
         String key = keyword.toLowerCase().trim();
         for (QuyenDTO q : listQuyen) {
@@ -108,5 +119,16 @@ public class QuyenBUS {
             }
         }
         return result;
+    }
+
+    public QuyenDTO searchById(int id) {
+        // Refresh the list before searching
+        listQuyen = daoQuyen.selectAll();
+        for (QuyenDTO q : listQuyen) {
+            if (q.getId() == id) {
+                return q;
+            }
+        }
+        return null;
     }
 }

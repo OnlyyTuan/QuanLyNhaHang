@@ -24,6 +24,15 @@ import java.util.List;
 public class HoaDonDialog extends JDialog {
     private JComboBox<BanAnDTO> jComboBoxBanAn;
     private BanAnBUS banAnBUS;
+    private OnInvoiceCreatedListener listener;
+
+    public interface OnInvoiceCreatedListener {
+        void onInvoiceCreated();
+    }
+
+    public void setOnInvoiceCreatedListener(OnInvoiceCreatedListener listener) {
+        this.listener = listener;
+    }
 
     /**
      * Creates new form HoaDonDialog
@@ -43,10 +52,10 @@ public class HoaDonDialog extends JDialog {
         try {
             Connection conn = DBConnector.getConnection();
             banAnBUS = new BanAnBUS(conn);
-            List<BanAnDTO> availableTables = banAnBUS.AvailableTable();
+            List<BanAnDTO> busyTables = banAnBUS.busyTable();
             
             jComboBoxBanAn.removeAllItems();
-            for (BanAnDTO ban : availableTables) {
+            for (BanAnDTO ban : busyTables) {
                 jComboBoxBanAn.addItem(ban);
             }
             
@@ -58,7 +67,8 @@ public class HoaDonDialog extends JDialog {
                     boolean isSelected, boolean cellHasFocus) {
                     super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                     if (value instanceof BanAnDTO) {
-                        setText(((BanAnDTO) value).getTen());
+                        BanAnDTO ban = (BanAnDTO) value;
+                        setText(String.format("ID: %d - %s", ban.getId(), ban.getTen()));
                     }
                     return this;
                 }
@@ -175,6 +185,9 @@ public class HoaDonDialog extends JDialog {
             
             if (result.isSuccess()) {
                 JOptionPane.showMessageDialog(this, result.getMessage());
+                if (listener != null) {
+                    listener.onInvoiceCreated();
+                }
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(this, result.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);

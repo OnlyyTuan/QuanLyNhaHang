@@ -196,6 +196,75 @@ INSERT INTO `hoadon` (`id_nhanVien`, `id_banAn`, `tenKhach`, `tongTien`, `thoigi
 (5, 5, 'Khách 4', 50000, '2024-05-17 13:00:00', ''),
 (1, 4, 'Khách 5', 200000, '2024-05-17 14:00:00', 'Khách quen');
 
+INSERT INTO `quyen` (`id`, `ten`) VALUES
+(1, 'Admin'),
+(2, 'Nhân viên');
+
+-- Dữ liệu cho bảng chucnang
+INSERT INTO `chucnang` (`id`, `ten`) VALUES
+(1, 'Nhân viên'),
+(2, 'Bàn ăn'),
+(3, 'Món ăn'),
+(4, 'Hóa đơn'),
+(5, 'Quyền'),
+(6, 'Tài khoản');
+
+
+
+-- Dữ liệu cho bảng chitietquyen (role permissions)
+-- Admin có tất cả quyền
+INSERT INTO `chitietquyen` (`id_quyen`, `id_chucNang`, `hanhDong`) VALUES
+-- Món ăn
+(1, 1, 'Xem'),
+(1, 1, 'Thêm'),
+(1, 1, 'Sửa'),
+(1, 1, 'Xóa'),
+-- Bàn ăn
+(1, 2, 'Xem'),
+(1, 2, 'Thêm'),
+(1, 2, 'Sửa'),
+(1, 2, 'Xóa'),
+-- Hóa đơn
+(1, 3, 'Xem'),
+(1, 3, 'Thêm'),
+(1, 3, 'Sửa'),
+(1, 3, 'Xóa'),
+(1, 3, 'In'),
+-- Nhân viên
+(1, 4, 'Xem'),
+(1, 4, 'Thêm'),
+(1, 4, 'Sửa'),
+(1, 4, 'Xóa'),
+-- Phân quyền
+(1, 5, 'Xem'),
+(1, 5, 'Thêm'),
+(1, 5, 'Sửa'),
+(1, 5, 'Xóa'),
+-- Tài khoản
+(1, 6, 'Xem'),
+(1, 6, 'Thêm'),
+(1, 6, 'Sửa'),
+(1, 6, 'Xóa');
+
+-- Nhân viên chỉ có một số quyền hạn chế
+INSERT INTO `chitietquyen` (`id_quyen`, `id_chucNang`, `hanhDong`) VALUES
+-- Món ăn
+(2, 1, 'Xem'),
+-- Bàn ăn
+(2, 2, 'Xem'),
+(2, 2, 'Sửa'),
+-- Hóa đơn
+(2, 3, 'Xem'),
+(2, 3, 'Thêm'),
+(2, 3, 'Sửa'),
+(2, 3, 'In'),
+-- Nhân viên
+(2, 4, 'Xem'),
+-- Phân quyền
+(2, 5, 'Xem'),
+-- Tài khoản
+(2, 6, 'Xem'),
+(2, 6, 'Sửa');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

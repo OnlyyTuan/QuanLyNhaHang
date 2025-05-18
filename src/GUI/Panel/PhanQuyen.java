@@ -6,15 +6,15 @@ package GUI.Panel;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.table.DefaultTableModel;
-
+import GUI.Dialog.PQdetailDialog;
 import config.DBConnector;
-import DTO.BanAnDTO;
-import BUS.BanAnBUS;
 import DTO.QuyenDTO;
 import BUS.QuyenBUS;
 import javax.swing.JOptionPane;
+import GUI.Dialog.QuyenDialog;
 /**
  *
  * @author MSI
@@ -53,8 +53,6 @@ public class PhanQuyen extends javax.swing.JPanel {
     }
 
     public void loadTableData() {
-        Connection conn = DBConnector.getConnection();
-        QuyenBUS quyenBUS = new QuyenBUS(conn);
         List<QuyenDTO> list = quyenBUS.getListQuyen();
     
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -68,6 +66,56 @@ public class PhanQuyen extends javax.swing.JPanel {
         }
     }
 
+    public void openAddDialog() {
+        QuyenDialog dialog = new QuyenDialog();
+        dialog.setVisible(true);
+        
+        // Refresh table data after dialog is closed
+        loadTableData();
+        
+        // Select the last row (newly added role)
+        if (jTable1.getRowCount() > 0) {
+            int lastRow = jTable1.getRowCount() - 1;
+            jTable1.setRowSelectionInterval(lastRow, lastRow);
+            jTable1.scrollRectToVisible(jTable1.getCellRect(lastRow, 0, true));
+        }
+    }
+
+    public void openDetailDialog() {
+        if (selectedTableId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn quyền cần xem chi tiết!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        QuyenDTO quyen = quyenBUS.getById(selectedTableId);
+        if (quyen != null) {
+            PQdetailDialog dialog = new PQdetailDialog((javax.swing.JFrame) this.getTopLevelAncestor(), quyen);
+            dialog.setVisible(true);
+        }
+    }
+
+    public void openModifyDialog() {
+        if (selectedTableId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn quyền cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        QuyenDTO quyen = quyenBUS.getById(selectedTableId);
+        if (quyen != null) {
+            QuyenDialog dialog = new QuyenDialog(quyen);
+            dialog.setVisible(true);
+            
+            if (dialog.isModified()) {
+                loadTableData();
+                // Reselect the modified role
+                for (int i = 0; i < jTable1.getRowCount(); i++) {
+                    if ((int)jTable1.getValueAt(i, 0) == selectedTableId) {
+                        jTable1.setRowSelectionInterval(i, i);
+                        jTable1.scrollRectToVisible(jTable1.getCellRect(i, 0, true));
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     public boolean deleteTable(int tableId) {
         if (tableId == -1) {
@@ -91,11 +139,70 @@ public class PhanQuyen extends javax.swing.JPanel {
                         "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi khi xóa quyền: " + ex.getMessage(), 
+                JOptionPane.showMessageDialog(this, ex.getMessage(), 
                     "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
         return false;
+    }
+
+    public void searchQuyen(String searchText, String searchType) {
+        List<QuyenDTO> searchResults;
+        
+        if (searchText.isEmpty()) {
+            // Nếu không có từ khóa tìm kiếm, hiển thị tất cả
+            searchResults = quyenBUS.getListQuyen();
+        } else {
+            switch (searchType) {
+                case "ID":
+                    try {
+                        int searchId = Integer.parseInt(searchText);
+                        QuyenDTO quyen = quyenBUS.searchById(searchId);
+                        searchResults = new ArrayList<>();
+                        if (quyen != null) {
+                            searchResults.add(quyen);
+                        }
+                    } catch (NumberFormatException e) {
+                        searchResults = new ArrayList<>();
+                        JOptionPane.showMessageDialog(this, 
+                            "ID phải là số nguyên!", 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+                    
+                case "Tên quyền":
+                    searchResults = quyenBUS.searchByName(searchText);
+                    break;
+                    
+                default:
+                    searchResults = quyenBUS.getListQuyen();
+                    break;
+            }
+        }
+        
+        // Cập nhật bảng với kết quả tìm kiếm
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        
+        for (QuyenDTO q : searchResults) {
+            model.addRow(new Object[]{
+                q.getId(),
+                q.getTen()
+            });
+        }
+        
+        // Thông báo nếu không tìm thấy kết quả
+        if (searchResults.isEmpty() && !searchText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Không tìm thấy kết quả phù hợp!", 
+                "Thông báo", 
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public javax.swing.JTable getTable() {
+        return jTable1;
     }
     /**
      * This method is called from within the constructor to initialize the form.

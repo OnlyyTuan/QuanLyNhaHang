@@ -11,6 +11,8 @@ import BUS.BanAnBUS;
 import java.sql.Connection;
 import config.DBConnector;
 import javax.swing.JOptionPane;
+import GUI.Dialog.BAmodifyDialog;
+import GUI.Dialog.BAdetailDialog;
 
 /**
  *
@@ -46,6 +48,10 @@ public class BanAn extends javax.swing.JPanel {
 
     public int getSelectedTableId() {
         return selectedTableId;
+    }
+
+    public BanAnBUS getBanAnBUS() {
+        return banAnBUS;
     }
 
     public void loadTableData() {
@@ -91,6 +97,105 @@ public class BanAn extends javax.swing.JPanel {
             }
         }
         return false;
+    }
+
+    public void openModifyDialog() {
+        if (selectedTableId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn bàn cần chỉnh sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        BanAnDTO banAn = banAnBUS.getByID(selectedTableId);
+        if (banAn != null) {
+            BAmodifyDialog dialog = new BAmodifyDialog((javax.swing.JFrame) this.getTopLevelAncestor(), banAn);
+            dialog.setVisible(true);
+            
+            if (dialog.isModified()) {
+                loadTableData();
+                // Reselect the modified table
+                for (int i = 0; i < jTable1.getRowCount(); i++) {
+                    if ((int)jTable1.getValueAt(i, 0) == selectedTableId) {
+                        jTable1.setRowSelectionInterval(i, i);
+                        jTable1.scrollRectToVisible(jTable1.getCellRect(i, 0, true));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void openDetailDialog() {
+        if (selectedTableId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn bàn cần xem chi tiết!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        BanAnDTO banAn = banAnBUS.getByID(selectedTableId);
+        if (banAn != null) {
+            BAdetailDialog dialog = new BAdetailDialog((javax.swing.JFrame) this.getTopLevelAncestor(), banAn);
+            dialog.setVisible(true);
+        }
+    }
+
+    public void searchTable(String searchText, String searchType) {
+        List<BanAnDTO> searchResults;
+        
+        if (searchText.isEmpty()) {
+            // Nếu không có từ khóa tìm kiếm, hiển thị tất cả
+            searchResults = banAnBUS.getList_banAn();
+        } else {
+            switch (searchType) {
+                case "ID":
+                    try {
+                        int searchId = Integer.parseInt(searchText);
+                        BanAnDTO banAn = banAnBUS.getByID(searchId);
+                        searchResults = new ArrayList<>();
+                        if (banAn != null) {
+                            searchResults.add(banAn);
+                        }
+                    } catch (NumberFormatException e) {
+                        searchResults = new ArrayList<>();
+                        JOptionPane.showMessageDialog(this, 
+                            "ID phải là số nguyên!", 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+                    
+                case "Tên bàn":
+                    searchResults = banAnBUS.searchByName(searchText);
+                    break;
+                    
+                default:
+                    searchResults = banAnBUS.getList_banAn();
+                    break;
+            }
+        }
+        
+        // Cập nhật bảng với kết quả tìm kiếm
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        
+        for (BanAnDTO ban : searchResults) {
+            String trangThai = (ban.getTrangThai() == 1) ? "Đang sử dụng" : "Trống";
+            model.addRow(new Object[]{
+                ban.getId(),
+                ban.getTen(),
+                trangThai
+            });
+        }
+        
+        // Thông báo nếu không tìm thấy kết quả
+        if (searchResults.isEmpty() && !searchText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Không tìm thấy kết quả phù hợp!", 
+                "Thông báo", 
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public javax.swing.JTable getTable() {
+        return jTable1;
     }
 
     /**

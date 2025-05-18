@@ -12,8 +12,6 @@ import DTO.*;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Color;
 import javax.swing.JOptionPane;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 /**
@@ -151,9 +149,11 @@ public class LoginFrame extends javax.swing.JFrame {
             return;
         }
         
-        TaiKhoanDTO tk = appData.getTaiKhoanBUS().dangNhap(taiKhoan, matKhau);
-        if (tk != null) {
-            MainFrame mainFrame = new MainFrame(tk);
+        TaiKhoanBUS.LoginResult result = appData.getTaiKhoanBUS().dangNhap(taiKhoan, matKhau);
+        if (result.taiKhoan != null && result.nhanVien != null) {
+            MainFrame mainFrame = new MainFrame(result.taiKhoan);
+            // Update employee info in SideMenu
+            mainFrame.getSideMenu().setCurrentEmployee(result.nhanVien);
             mainFrame.setVisible(true);
             this.dispose();
         } else {

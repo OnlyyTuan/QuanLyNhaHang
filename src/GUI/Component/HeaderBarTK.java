@@ -9,6 +9,13 @@ import GUI.Dialog.BanAnDialog;
 import GUI.Panel.BanAn;
 import GUI.Panel.TaiKhoan;
 import GUI.Dialog.TaiKhoanDialog;
+import GUI.Dialog.TKmodifyDialog;
+import BUS.TaiKhoanBUS;
+import DTO.TaiKhoanDTO;
+import java.sql.Connection;
+import javax.swing.JOptionPane;
+import config.DBConnector;
+import helper.JTableExporter;
 /**
  *
  * @author MSI
@@ -48,9 +55,24 @@ public class HeaderBarTK extends javax.swing.JPanel {
 
         jTextFieldSearchBar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTextFieldSearchBar.setText("Tìm kiếm");
+        jTextFieldSearchBar.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().equals("Tìm kiếm")) {
+                    jTextFieldSearchBar.setText("");
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (jTextFieldSearchBar.getText().isEmpty()) {
+                    jTextFieldSearchBar.setText("Tìm kiếm");
+                }
+            }
+        });
 
         jComboBoxSearchType.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxSearchType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
+            "ID", 
+            "Tài khoản"
+        }));
         jComboBoxSearchType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSearchTypeActionPerformed(evt);
@@ -106,8 +128,27 @@ public class HeaderBarTK extends javax.swing.JPanel {
         });
 
         jButtonDetail3.setText("Chi tiết");
+        jButtonDetail3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDetail3ActionPerformed(evt);
+            }
+        });
 
         jButtonExport.setText("Export");
+        jButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (taiKhoanPanel != null) {
+                    try {
+                        JTableExporter.exportJTableToExcel(taiKhoanPanel.getTable());
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, 
+                            "Lỗi khi xuất file Excel: " + e.getMessage(), 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
 
         jButtonImport.setText("Import");
 
@@ -167,7 +208,15 @@ public class HeaderBarTK extends javax.swing.JPanel {
     }//GEN-LAST:event_jComboBoxSearchTypeActionPerformed
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-        // TODO add your handling code here:
+        if (taiKhoanPanel != null) {
+            String searchText = jTextFieldSearchBar.getText().trim();
+            if (searchText.equals("Tìm kiếm")) {
+                searchText = "";
+            }
+            
+            String searchType = jComboBoxSearchType.getSelectedItem().toString();
+            taiKhoanPanel.searchTaiKhoan(searchText, searchType);
+        }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
     private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
@@ -188,6 +237,23 @@ public class HeaderBarTK extends javax.swing.JPanel {
 
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
         // TODO add your handling code here:
+        if (taiKhoanPanel != null) {
+            int selectedId = taiKhoanPanel.getSelectedTableId();
+            if (selectedId == -1) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn tài khoản cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            Connection conn = DBConnector.getConnection();
+            TaiKhoanBUS taiKhoanBUS = new TaiKhoanBUS(conn);
+            TaiKhoanDTO selectedTK = taiKhoanBUS.getById(selectedId);
+            
+            if (selectedTK != null) {
+                TKmodifyDialog dialog = new TKmodifyDialog(selectedTK);
+                dialog.setVisible(true);
+                taiKhoanPanel.loadTableData();
+            }
+        }
     }//GEN-LAST:event_jButtonModifyActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
@@ -197,13 +263,17 @@ public class HeaderBarTK extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
+    private void jButtonDetail3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDetail3ActionPerformed
+        // TODO add your handling code here:
+        if (taiKhoanPanel != null) {
+            taiKhoanPanel.openDetailDialog();
+        }
+    }//GEN-LAST:event_jButtonDetail3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonDelete;
-    private javax.swing.JButton jButtonDetail;
-    private javax.swing.JButton jButtonDetail1;
-    private javax.swing.JButton jButtonDetail2;
     private javax.swing.JButton jButtonDetail3;
     private javax.swing.JButton jButtonExport;
     private javax.swing.JButton jButtonImport;

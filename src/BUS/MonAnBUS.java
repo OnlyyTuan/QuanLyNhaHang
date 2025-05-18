@@ -22,30 +22,13 @@ public class MonAnBUS {
     }
 
     public List<MonAnDTO> getList_monAn() {
-        List<MonAnDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM monan";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                list.add(new MonAnDTO(
-                    rs.getInt("id"),
-                    rs.getString("ten"),
-                    rs.getInt("id_danhMuc"),
-                    rs.getInt("gia"),
-                    rs.getString("hinhAnh"),
-                    rs.getInt("trangThai")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
+        list_monAn = dao_monAn.selectAll();
+        return list_monAn;
     }
-
 
     public MonAnDAO getDao_monAn() {
         return dao_monAn;
-}
+    }
 
     public Result add(MonAnDTO newMonAn) {
         if(Validator.isEmpty(newMonAn.getTen())) {
@@ -67,15 +50,12 @@ public class MonAnBUS {
         }
 
         if(dao_monAn.insert(newMonAn) != 0) {
-            int newID = list_monAn.getLast().getId() + 1;
-            newMonAn.setId(newID);
-            list_monAn.add(newMonAn);
+            list_monAn = dao_monAn.selectAll();
             return new Result(true, "Thêm món ăn mới thành công");
         }
 
         return null;
     }
-
 
     public int getIndexById(int id) {
         for(int i=0; i<this.list_monAn.size(); i++) {
@@ -87,13 +67,14 @@ public class MonAnBUS {
 
     public Result update(MonAnDTO monAn) {
         if(dao_monAn.update(monAn) != 0) {
-            list_monAn.set(getIndexById(monAn.getId()), monAn);
+            list_monAn = dao_monAn.selectAll();
             return new Result(true, "Cập nhật món ăn thành công");
         }
         return new Result(false, "Cập nhật món ăn thất bại");
     }
 
     public MonAnDTO getByID(int id) {
+        list_monAn = dao_monAn.selectAll();
         for(MonAnDTO i : list_monAn) {
             if(i.getId() == id)
                 return i;
@@ -115,13 +96,16 @@ public class MonAnBUS {
 
     public boolean delete(int id) {
         try {
-            return dao_monAn.delete(id) > 0;
+            boolean result = dao_monAn.delete(id) > 0;
+            if (result) {
+                list_monAn = dao_monAn.selectAll();
+            }
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    
 }
     
     

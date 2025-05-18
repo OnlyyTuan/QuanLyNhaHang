@@ -11,10 +11,17 @@ package BUS;
 public class Result {
     private boolean success;
     private String message;
+    private int id;
 
     public Result(boolean success, String message) {
         this.success = success;
         this.message = message;
+    }
+
+    public Result(boolean success, String message, int id) {
+        this.success = success;
+        this.message = message;
+        this.id = id;
     }
 
     public boolean isSuccess() {
@@ -23,5 +30,9 @@ public class Result {
 
     public String getMessage() {
         return message;
+    }
+
+    public int getId() {
+        return id;
     }
 } 

@@ -17,6 +17,7 @@ import java.util.List;
 public class TaiKhoanDialog extends JDialog {
     private TaiKhoanDTO taiKhoan;
     private boolean isEdit;
+    private boolean modified = false;
     private JComboBox<NhanVienDTO> jComboBoxNhanVien;
     private JComboBox<QuyenDTO> jComboBoxQuyen;
     private JComboBox<String> jComboBoxTrangThai;
@@ -34,6 +35,10 @@ public class TaiKhoanDialog extends JDialog {
         if (isEdit) {
             loadData();
         }
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 
     private void setupDialog() {
@@ -243,10 +248,16 @@ public class TaiKhoanDialog extends JDialog {
                 this.taiKhoan.setIdQuyen(selectedQuyen.getId());
                 this.taiKhoan.setTrangThai(trangThai);
                 result = taiKhoanBUS.update(this.taiKhoan);
+                if (result.isSuccess()) {
+                    modified = true;
+                }
             } else {
                 TaiKhoanDTO newTK = new TaiKhoanDTO(0, selectedNV.getId(), selectedQuyen.getId(), 
                     taiKhoan, matKhau, trangThai);
                 result = taiKhoanBUS.add(newTK);
+                if (result.isSuccess()) {
+                    modified = true;
+                }
             }
 
             if (result.isSuccess()) {
