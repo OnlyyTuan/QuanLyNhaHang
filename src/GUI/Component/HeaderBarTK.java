@@ -4,6 +4,7 @@
  */
 package GUI.Component;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import GUI.Dialog.BanAnDialog;
 import GUI.Panel.BanAn;
@@ -187,7 +188,15 @@ public class HeaderBarTK extends javax.swing.JPanel {
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
-        // TODO add your handling code here:
+        int selectedId = taiKhoanPanel.getSelectedTableId();
+        if (selectedId == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn tài khoản để sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // Tạo dialog sửa và truyền id tài khoản
+        TaiKhoanDialog dialog = new TaiKhoanDialog();
+        dialog.setVisible(true);
+        taiKhoanPanel.loadTableData();
     }//GEN-LAST:event_jButtonModifyActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
@@ -201,9 +210,6 @@ public class HeaderBarTK extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonDelete;
-    private javax.swing.JButton jButtonDetail;
-    private javax.swing.JButton jButtonDetail1;
-    private javax.swing.JButton jButtonDetail2;
     private javax.swing.JButton jButtonDetail3;
     private javax.swing.JButton jButtonExport;
     private javax.swing.JButton jButtonImport;

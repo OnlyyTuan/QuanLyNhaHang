@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package GUI.Panel;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
@@ -20,6 +17,8 @@ import BUS.NhanVienBUS;
 public class NhanVien extends javax.swing.JPanel {
     private int selectedTableId = -1;
     private NhanVienBUS nhanVienBUS;
+    private List<NhanVienDTO> danhSachNhanVienGoc;  // Lưu danh sách gốc để tìm kiếm
+
     /**
      * Creates new form KhachHang
      */
@@ -30,7 +29,6 @@ public class NhanVien extends javax.swing.JPanel {
         loadTableData();
         setupNhanVienSelection();
     }
-
 
     private void setupNhanVienSelection() {
         jTable1.getSelectionModel().addListSelectionListener(e -> {
@@ -52,12 +50,12 @@ public class NhanVien extends javax.swing.JPanel {
     public void loadTableData() {
         Connection conn = DBConnector.getConnection();
         NhanVienBUS nhanVienBUS = new NhanVienBUS(conn);
-        List<NhanVienDTO> list = nhanVienBUS.getListNhanVien();
+        danhSachNhanVienGoc = nhanVienBUS.getListNhanVien();  // Lưu danh sách gốc
     
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);
     
-        for (NhanVienDTO nv : list) {
+        for (NhanVienDTO nv : danhSachNhanVienGoc) {
             String trangThai = (nv.getTrangThai() == 1) ? "Đang làm việc" : "Đã nghỉ";
             model.addRow(new Object[]{
                 nv.getId(),
@@ -96,6 +94,67 @@ public class NhanVien extends javax.swing.JPanel {
             }
         }
         return false;
+    }
+
+    // Phương thức tìm kiếm dữ liệu trong bảng theo từ khóa và loại tìm kiếm
+    public void searchTableData(String keyword, String searchType) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            loadTableData();  // Nếu không có từ khóa thì load lại dữ liệu đầy đủ
+            return;
+        }
+
+        keyword = keyword.toLowerCase().trim();
+        List<NhanVienDTO> filteredList = new ArrayList<>();
+
+        for (NhanVienDTO nv : danhSachNhanVienGoc) {
+            switch (searchType) {
+                case "Tên":
+                    if (nv.getHoTen().toLowerCase().contains(keyword)) {
+                        filteredList.add(nv);
+                    }
+                    break;
+                case "Chức vụ":
+                    if (nv.getChucVu().toLowerCase().contains(keyword)) {
+                        filteredList.add(nv);
+                    }
+                    break;
+                case "Giới tính":
+                    if (nv.getGioiTinh().toLowerCase().contains(keyword)) {
+                        filteredList.add(nv);
+                    }
+                    break;
+                case "Trạng thái":
+                    String trangThai = (nv.getTrangThai() == 1) ? "đang làm việc" : "đã nghỉ";
+                    if (trangThai.contains(keyword)) {
+                        filteredList.add(nv);
+                    }
+                    break;
+                default:
+                    // Nếu không có loại tìm kiếm hợp lệ, tìm tất cả các trường trên
+                    if (nv.getHoTen().toLowerCase().contains(keyword)
+                        || nv.getChucVu().toLowerCase().contains(keyword)
+                        || nv.getGioiTinh().toLowerCase().contains(keyword)
+                        || ((nv.getTrangThai() == 1 ? "đang làm việc" : "đã nghỉ").contains(keyword))) {
+                        filteredList.add(nv);
+                    }
+                    break;
+            }
+        }
+
+        // Cập nhật bảng với dữ liệu lọc
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+
+        for (NhanVienDTO nv : filteredList) {
+            String trangThai = (nv.getTrangThai() == 1) ? "Đang làm việc" : "Đã nghỉ";
+            model.addRow(new Object[]{
+                nv.getId(),
+                nv.getHoTen(),
+                nv.getGioiTinh(),
+                nv.getChucVu(),
+                trangThai
+            });
+        }
     }
 
     /**

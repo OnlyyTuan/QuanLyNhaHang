@@ -19,7 +19,7 @@ public class AppData {
     
     public AppData() {
         try {
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quanlynhahang", "root", "1234");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quanlynhahang", "root", "123456");
             banAnBUS = new BanAnBUS(conn);
             taiKhoanBUS = new TaiKhoanBUS(conn);
         } catch (SQLException e) {

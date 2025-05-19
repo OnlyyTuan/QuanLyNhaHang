@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
  */
 public class PhanQuyen extends javax.swing.JPanel {
     private int selectedTableId = -1;
-    private QuyenBUS quyenBUS;
+    public QuyenBUS quyenBUS;
     /**
      * Creates new form PhanQuyen
      */
@@ -146,6 +146,6 @@ public class PhanQuyen extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private GUI.Component.HeaderBarQuyen headerBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    public javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

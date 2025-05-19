@@ -11,9 +11,9 @@ import javax.swing.JOptionPane;
  * @author Admin
  */
 public class DBConnector {
-    private static String url = "jdbc:mysql://localhost:3306/quanlynhahang";
+    private static String url = "jdbc:mysql://localhost:3306/quanlynhahang?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static String userName = "root";
-    private static String passWord = "1234";
+    private static String passWord = "123456";
     
     public static boolean checkConnection() {
         Connection conn = null;
